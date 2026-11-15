@@ -1,0 +1,1192 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#D7B39A">
+  <meta name="description" content="Bonança Yoga — uma experiência de respiração, movimento consciente e pausa real.">
+  <title>Bonança Yoga — Respire, habite, retorne</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-plate-base: #D7B39A;
+      --bg-plate-edge: #C6A188;
+      --bg-plate-highlight: #E8D0BE;
+      --ink-primary: #071C1D;
+      --ink-secondary: #071C1D;
+      --ink-muted: #071C1D;
+      --ink-hairline: rgba(7, 28, 29, 0.24);
+      --breath-light-core: rgba(255, 252, 245, 0.95);
+      --breath-light-halo: rgba(255, 236, 195, 0.78);
+      --grain-terracotta: #8C6A46;
+      --grain-quartz: #FFFDF7;
+      --breath-radius: 10vmin;
+      --breath-opacity: 0.65;
+      --serif: "Cormorant Garamond", "Times New Roman", serif;
+      --sans: "Plus Jakarta Sans", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    body {
+      position: relative;
+      color: var(--ink-primary);
+      background:
+        radial-gradient(ellipse at 50% 50%, var(--bg-plate-highlight) 0%, var(--bg-plate-base) 50%, var(--bg-plate-edge) 100%);
+      font-family: var(--serif);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    button, a { color: inherit; }
+    button { font: inherit; }
+
+    .plate, .sand-texture, .sand-canvas, .breath-light, .mandala-watermark {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .plate {
+      z-index: 0;
+      background: radial-gradient(ellipse at 50% 50%, var(--bg-plate-highlight) 0%, var(--bg-plate-base) 51%, var(--bg-plate-edge) 100%);
+    }
+
+    .sand-texture {
+      z-index: 1;
+      opacity: 0.3;
+    }
+
+    .breath-light {
+      z-index: 3;
+      inset: 50% auto auto 50%;
+      width: calc(var(--breath-radius) * 2);
+      height: calc(var(--breath-radius) * 2);
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      opacity: var(--breath-opacity);
+      background: radial-gradient(circle, var(--breath-light-core) 0%, var(--breath-light-core) 24%, var(--breath-light-halo) 52%, rgba(255, 236, 195, 0.12) 72%, transparent 100%);
+      box-shadow: 0 0 5vmin 2vmin rgba(255, 252, 245, 0.26), 0 0 15vmin 5vmin rgba(255, 236, 195, 0.17);
+      mix-blend-mode: screen;
+      will-change: width, height, opacity, box-shadow;
+    }
+
+    .sand-canvas { z-index: 2; }
+
+    .mandala-watermark {
+      z-index: 4;
+      inset: 50% auto auto 50%;
+      width: min(84vmin, 680px);
+      height: min(84vmin, 680px);
+      overflow: visible;
+      color: var(--ink-primary);
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(var(--mandala-scale, 0.97));
+      transition: opacity 1000ms cubic-bezier(0.37, 0, 0.23, 1);
+      will-change: opacity, transform;
+    }
+
+    .mandala-watermark.is-visible { opacity: var(--mandala-opacity, 0.16); }
+
+    .vignette {
+      position: fixed;
+      z-index: 4;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 54%, rgba(70, 49, 28, 0.05) 100%);
+    }
+
+    .site-shell {
+      position: relative;
+      z-index: 4;
+      width: 100%;
+      height: 100%;
+      isolation: isolate;
+    }
+
+    .brand-lockup {
+      --logo-width: clamp(15rem, 42vw, 38rem);
+      --logo-reveal: 0;
+      position: absolute;
+      z-index: 5;
+      top: 50%;
+      left: 50%;
+      display: block;
+      width: var(--logo-width);
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--ink-primary);
+      cursor: pointer;
+      transform: translate(-50%, -50%) scale(calc(0.96 + 0.04 * var(--logo-reveal)));
+      opacity: var(--logo-reveal);
+      filter: blur(calc(8px * (1 - var(--logo-reveal))));
+      transition:
+        top 1000ms cubic-bezier(0.37, 0, 0.23, 1),
+        left 1000ms cubic-bezier(0.37, 0, 0.23, 1);
+      pointer-events: none;
+      will-change: opacity, filter, transform, top;
+    }
+
+    .brand-lockup.is-small {
+      --logo-width: clamp(9rem, 14vw, 12rem);
+      top: clamp(2.1rem, 5vh, 3.1rem);
+      transform: translate(-50%, -50%) scale(1);
+      pointer-events: auto;
+    }
+
+    .brand-lockup.is-visible { pointer-events: auto; }
+
+    .brand-lockup:focus-visible {
+      outline: 1px solid currentColor;
+      outline-offset: 0.35rem;
+    }
+
+    .brand-lockup svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+      fill: currentColor;
+    }
+
+    .brand-word, .brand-yoga {
+      font-family: var(--serif);
+      text-anchor: middle;
+    }
+
+    .brand-word {
+      font-size: 100px;
+      font-weight: 600;
+      letter-spacing: 16px;
+    }
+
+    .brand-rule {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 4;
+    }
+
+    .brand-yoga {
+      font-size: 31px;
+      font-weight: 400;
+      letter-spacing: 14px;
+    }
+
+    .editorial-nav {
+      position: fixed;
+      z-index: 6;
+      top: calc(50% + clamp(3.2rem, 5.2vw, 5rem) + 2.5rem);
+      left: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      gap: clamp(0.5rem, 2vw, 1.5rem);
+      width: min(94vw, 76rem);
+      min-height: 3.2rem;
+      padding: 0.75rem 0.5rem;
+      margin: 0;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -0.5rem);
+      border-top: 1px solid rgba(7, 28, 29, 0.26);
+      border-bottom: 1px solid rgba(7, 28, 29, 0.26);
+      transition: opacity 1000ms cubic-bezier(0.37, 0, 0.23, 1), transform 1000ms cubic-bezier(0.37, 0, 0.23, 1), top 1000ms cubic-bezier(0.37, 0, 0.23, 1);
+    }
+
+    .editorial-nav.is-section {
+      top: clamp(4.5rem, 10.5vh, 6.2rem);
+    }
+
+    .editorial-nav.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, 0);
+    }
+
+    .editorial-nav button {
+      flex: 0 0 auto;
+      padding: 0.35rem 0;
+      border: 0;
+      background: transparent;
+      color: var(--ink-primary);
+      cursor: pointer;
+      font-family: var(--sans);
+      font-size: clamp(0.55rem, 0.72vw, 0.68rem);
+      font-weight: 400;
+      letter-spacing: 0.20em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      transition: opacity 300ms ease;
+    }
+
+    .editorial-nav button + button::before {
+      position: absolute;
+      top: 50%;
+      left: calc(clamp(0.5rem, 2vw, 1.5rem) * -0.72);
+      color: rgba(7, 28, 29, 0.5);
+      content: "•";
+      font-size: 0.6em;
+      transform: translate(-50%, -50%);
+    }
+
+    .editorial-nav button { position: relative; }
+
+    .editorial-nav button::after {
+      display: block;
+      width: 0;
+      height: 1px;
+      margin-top: 0.2rem;
+      background: currentColor;
+      content: "";
+      transition: width 300ms ease;
+    }
+
+    .editorial-nav button:hover::after,
+    .editorial-nav button[aria-current="page"]::after { width: 100%; }
+
+    .content-stage {
+      position: absolute;
+      z-index: 4;
+      top: clamp(7.2rem, 16vh, 9.5rem);
+      right: 0;
+      bottom: clamp(3.5rem, 8vh, 5rem);
+      left: 0;
+      display: grid;
+      place-items: center;
+      padding: 0 1.5rem;
+      pointer-events: none;
+    }
+
+    .editorial-content {
+      width: min(100%, 48rem);
+      max-width: 48rem;
+      max-height: 100%;
+      margin: 0 auto;
+      overflow: auto;
+      padding: 1rem 1rem 2rem;
+      color: var(--ink-primary);
+      background: transparent !important;
+      pointer-events: auto;
+      text-align: center;
+      text-shadow: 0 0 12px rgba(255, 250, 242, 0.28);
+      scrollbar-width: thin;
+      scrollbar-color: var(--ink-hairline) transparent;
+      transition: opacity 1000ms cubic-bezier(0.37, 0, 0.23, 1), transform 1000ms cubic-bezier(0.37, 0, 0.23, 1), filter 1000ms cubic-bezier(0.37, 0, 0.23, 1);
+    }
+
+    .editorial-content.is-leaving {
+      opacity: 0;
+      filter: blur(5px);
+      transform: translateY(-6px);
+      pointer-events: none;
+    }
+
+    .editorial-content.is-entering {
+      opacity: 0;
+      filter: blur(5px);
+      transform: translateY(6px);
+    }
+
+    .eyebrow, .micro-label, .return-home, .schedule-time {
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.22em;
+      line-height: 1.7;
+      text-transform: uppercase;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin: 0 0 0.9rem;
+      color: var(--ink-primary);
+      font-size: 0.68rem;
+      letter-spacing: 0.24em;
+    }
+
+    .eyebrow::before {
+      width: 2.6rem;
+      height: 1px;
+      background: var(--ink-hairline);
+      content: "";
+    }
+
+    .editorial-content h1, .editorial-content h2, .editorial-content p { margin-top: 0; }
+
+    .editorial-content h1 {
+      max-width: 24ch;
+      margin: 0 auto 1rem;
+      color: var(--ink-primary);
+      font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    .editorial-content h2 {
+      margin-bottom: 0.65rem;
+      font-size: clamp(1.8rem, 3vw, 2.7rem);
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    .editorial-content p {
+      max-width: 46ch;
+      margin: 0 auto;
+      color: var(--ink-primary);
+      font-size: clamp(1rem, 1.25vw, 1.2rem);
+      font-weight: 400;
+      line-height: 1.6;
+    }
+
+    .editorial-intro {
+      display: grid;
+      grid-template-columns: 1fr minmax(16rem, 0.75fr);
+      align-items: end;
+      gap: clamp(1.5rem, 6vw, 6rem);
+      border-bottom: 1px solid var(--ink-hairline);
+      padding-bottom: 2rem;
+    }
+
+    .practice-list, .schedule-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem 2rem;
+      margin-top: 1rem;
+      border-top: 1px solid var(--ink-hairline);
+    }
+
+    .practice-item, .schedule-item {
+      min-height: 0;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--ink-hairline);
+      text-align: left;
+    }
+
+    .practice-item h2 {
+      font-size: clamp(1.25rem, 1.8vw, 1.55rem);
+    }
+
+    .practice-item p, .schedule-item p {
+      max-width: none;
+      margin: 0;
+      font-size: clamp(1rem, 1.25vw, 1.18rem);
+      line-height: 1.55;
+      text-align: left;
+    }
+
+    .schedule-item {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.65rem;
+      min-height: 6.5rem;
+    }
+
+    .schedule-time { font-size: 0.67rem; }
+    .schedule-item p { color: var(--ink-primary); }
+
+    .quote {
+      max-width: 28ch;
+      margin: 0 auto 1rem;
+      font-size: clamp(1.55rem, 2.7vw, 2.35rem);
+      font-weight: 300;
+      font-style: italic;
+      letter-spacing: -0.025em;
+      line-height: 1.22;
+    }
+
+    .contact-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .editorial-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 1.1rem;
+      min-height: 3rem;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid var(--ink-hairline);
+      font-size: 1.35rem;
+      font-style: italic;
+      text-decoration: none;
+      transition: border-color 300ms ease, gap 300ms ease;
+    }
+
+    .editorial-link:hover { gap: 1.55rem; border-color: var(--ink-primary); }
+
+    .return-home {
+      position: fixed;
+      z-index: 6;
+      bottom: clamp(1.25rem, 4vh, 2.5rem);
+      left: clamp(1.25rem, 4vw, 3.5rem);
+      padding: 0.55rem 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 800ms ease;
+    }
+
+    .return-home.is-visible { opacity: 0.76; pointer-events: auto; }
+    .return-home:hover { opacity: 1; }
+
+    .entry-invitation {
+      position: fixed;
+      z-index: 10;
+      bottom: clamp(1.6rem, 4.5vh, 3rem);
+      left: 50%;
+      width: min(90vw, 32rem);
+      margin: 0;
+      color: var(--ink-primary);
+      font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+      letter-spacing: 0.04em;
+      text-align: center;
+      opacity: 0;
+      filter: blur(2px);
+      transform: translate(-50%, 0.35rem);
+      pointer-events: none;
+      transition: opacity 800ms ease, filter 800ms ease, transform 800ms ease;
+    }
+
+    .entry-invitation.is-visible {
+      opacity: 0.88;
+      filter: blur(0);
+      transform: translate(-50%, 0);
+    }
+
+    .relaxation-hint {
+      position: fixed;
+      z-index: 10;
+      bottom: clamp(1.6rem, 4.5vh, 3rem);
+      left: 50%;
+      width: min(90vw, 32rem);
+      margin: 0;
+      padding: 0.4rem 0.8rem;
+      color: var(--ink-primary);
+      font-size: clamp(1.1rem, 2vw, 1.6rem);
+      font-style: italic;
+      font-weight: 400;
+      text-align: center;
+      opacity: 0;
+      filter: blur(3px);
+      transform: translate(-50%, 0.4rem);
+      pointer-events: none;
+      transition: opacity 800ms ease, filter 800ms ease, transform 800ms ease;
+    }
+
+    .relaxation-hint.is-visible {
+      opacity: 0.88;
+      filter: blur(0);
+      transform: translate(-50%, 0);
+    }
+
+    @media (max-width: 700px) {
+      .brand-lockup { --logo-width: clamp(15rem, 74vw, 26rem); }
+      .brand-lockup.is-small { --logo-width: clamp(9rem, 42vw, 12rem); top: clamp(2.1rem, 5vh, 3.1rem); }
+      .editorial-nav {
+        top: calc(50% + clamp(2rem, 8vw, 3rem) + 2.5rem);
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        justify-content: stretch;
+        gap: 0.15rem 0.4rem;
+        width: 94vw;
+        grid-template-rows: repeat(2, minmax(44px, auto));
+        min-height: 5.4rem;
+        padding: 0.25rem 0.15rem;
+        scrollbar-width: none;
+      }
+      .editorial-nav button {
+        min-width: 0;
+        min-height: 44px;
+        padding: 0.45rem 0.1rem;
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        white-space: normal;
+      }
+      .editorial-nav button + button::before {
+        display: none;
+      }
+      .editorial-nav.is-section { top: clamp(5.2rem, 10.5vh, 6.6rem); }
+      .content-stage { padding: 0 0.65rem; }
+      .editorial-content { padding: 0.7rem 0.6rem 1.5rem; }
+      .editorial-intro { grid-template-columns: 1fr; gap: 1rem; padding-bottom: 1.4rem; }
+      .practice-list, .schedule-list { grid-template-columns: 1fr; margin-top: 1rem; }
+      .practice-item, .schedule-item { min-height: 0; padding: 1rem 0; }
+      .micro-label, .return-home { font-size: 0.68rem; }
+      .return-home { bottom: max(5rem, 10vh); }
+      .entry-invitation, .relaxation-hint { bottom: clamp(1.6rem, 4.5vh, 3rem); }
+    }
+
+    @media (max-height: 700px) and (min-width: 701px) {
+      .brand-lockup.is-small { top: clamp(2.1rem, 5vh, 3.1rem); }
+      .editorial-nav.is-section { top: clamp(4.5rem, 10.5vh, 6.2rem); }
+      .editorial-content { padding-top: 0.3rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="plate" aria-hidden="true"></div>
+  <canvas class="sand-texture" aria-hidden="true"></canvas>
+  <canvas class="sand-canvas" aria-hidden="true"></canvas>
+  <div class="breath-light" aria-hidden="true"></div>
+  <svg class="mandala-watermark" viewBox="-500 -500 1000 1000" aria-hidden="true" focusable="false">
+    <g class="mandala-drawing" fill="none" stroke="#071C1D" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round"></g>
+  </svg>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <main class="site-shell">
+    <button class="brand-lockup" type="button" aria-label="Bonança Yoga — voltar ao centro" inert>
+      <svg viewBox="0 0 680 180" role="img" aria-labelledby="brand-title" focusable="false">
+        <title id="brand-title">Bonança Yoga</title>
+        <text class="brand-word" x="340" y="100" textLength="680" lengthAdjust="spacingAndGlyphs">BONANÇA</text>
+        <path class="brand-rule" d="M 97.14 112 H 582.86"></path>
+        <text class="brand-yoga" x="340" y="157" textLength="180" lengthAdjust="spacingAndGlyphs">YOGA</text>
+      </svg>
+    </button>
+
+    <nav class="editorial-nav" aria-label="Navegação principal" inert>
+      <button type="button" data-section="0">Filosofia</button>
+      <button type="button" data-section="1">Práticas</button>
+      <button type="button" data-section="2">Condução</button>
+      <button type="button" data-section="3">Horários</button>
+      <button type="button" data-section="4">Vivências</button>
+      <button type="button" data-section="5">Contato</button>
+    </nav>
+
+    <div class="content-stage" aria-live="polite"></div>
+    <p class="entry-invitation" aria-live="polite"></p>
+    <p class="relaxation-hint" aria-live="polite"></p>
+    <button class="return-home" type="button" inert>Voltar ao centro</button>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const canvas = document.querySelector(".sand-canvas");
+      const ctx = canvas.getContext("2d", { alpha: true });
+      const textureCanvas = document.querySelector(".sand-texture");
+      const textureCtx = textureCanvas.getContext("2d", { alpha: false });
+      const brand = document.querySelector(".brand-lockup");
+      const brandWord = document.querySelector(".brand-word");
+      const brandRule = document.querySelector(".brand-rule");
+      const editorialNav = document.querySelector(".editorial-nav");
+      const mandala = document.querySelector(".mandala-watermark");
+      const mandalaDrawing = document.querySelector(".mandala-drawing");
+      const contentStage = document.querySelector(".content-stage");
+      const entryInvitation = document.querySelector(".entry-invitation");
+      const hint = document.querySelector(".relaxation-hint");
+      const returnHomeButton = document.querySelector(".return-home");
+      const menuButtons = [...document.querySelectorAll("[data-section]")];
+      const mobileQuery = window.matchMedia("(max-width: 700px)");
+      const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const sections = [
+        {
+          label: "01 • O MANIFESTO DA PAUSA",
+          title: "Respirar fundo é o primeiro movimento de volta para casa.",
+          text: "A bonança depois da tempestade. Um espaço de respiração, movimento consciente e pausa real — onde o corpo desacelera no próprio ritmo da natureza e reencontra sua gravidade."
+        },
+        {
+          label: "02 • CAMINHOS PARA HABITAR O PRÓPRIO TEMPO",
+          practices: [
+            ["Hatha Integral", "Posturas sustentadas com atenção à respiração, alinhamento gentil e escuta do corpo. (60 min • Todos os níveis)"],
+            ["Vinyasa Consciente", "Fluxo contínuo guiado pelo compasso da inspiração e da exalação, cultivando presença em movimento."],
+            ["Yin & Restauração", "Permanências longas e silenciosas para soltar fáscias profundas e acalmar o sistema nervoso."],
+            ["Pranayama & Meditação", "A arte de expandir a vitalidade através do silêncio e da direção sutil do sopro."]
+          ]
+        },
+        {
+          label: "03 • CONDUÇÃO & LINHAGEM",
+          quote: "“Não praticamos para atingir uma forma perfeita, mas para reconhecer a quietude que já existe em nós.”",
+          text: "6 anos de dedicação ao Yoga Integral. A condução une técnica precisa, pranayama, sonoridade e acolhimento real — em turmas reduzidas, presencial e online, com atenção terapêutica individual."
+        },
+        {
+          label: "04 • ENCONTRE A MARÉ DA SUA SEMANA",
+          schedule: [
+            ["SEG & QUA • 07:00 — 08:00", "Hatha & Respiração (Online)"],
+            ["TER & QUI • 08:00 — 09:00", "Yoga Integral (Estúdio)"],
+            ["SEG & QUI • 19:30 — 20:30", "Prática Noturna de Aterramento"],
+            ["SEXTA • 18:00 — 19:00", "Yin & Meditação Guiada"]
+          ]
+        },
+        {
+          label: "05 • ENCONTROS AO AR LIVRE",
+          title: "Manhãs contemplativas entre o sopro, a terra e o mar.",
+          text: "Imersões mensais unindo prática ao ar livre, silêncio partilhado e presença. Uma pausa fora do relógio urbano para restaurar o ritmo natural."
+        },
+        {
+          label: "06 • TRAVESSIA & AGENDAMENTO",
+          title: "Encontre a sua bonança.",
+          text: "Dúvidas sobre turmas reduzidas, aulas particulares ou primeira prática experimental? Escreva sem pressa.",
+          contact: true
+        }
+      ];
+      const relaxationPhrases = [
+        "Relaxe o maxilar",
+        "Solte os ombros",
+        "Destrave a língua do céu da boca",
+        "Suavize o olhar",
+        "Solte o ar devagar",
+        "Descontraia as mãos",
+        "Deixe a testa relaxada",
+        "Sinta o ritmo da sua respiração"
+      ];
+
+      let width = 0;
+      let height = 0;
+      let dpr = 1;
+      let particles = [];
+      const grainColors = ["#344241", "#91745E", "#B59A84", "#FFFDF7"];
+      const grainBuckets = Array.from({ length: grainColors.length * 8 }, () => []);
+      const grainSprites = [];
+      let sandTexture = null;
+      let startedAt = performance.now();
+      let previousFrame = startedAt;
+      let animationFrameId = null;
+      let hasInteracted = false;
+      let menuActivated = false;
+      let currentSection = -1;
+      let isTransitioning = false;
+      let lastPhraseIndex = -1;
+      let hintTimers = [];
+      let scrollEnergy = 0;
+      let previousTouchY = null;
+      let previousTouchContent = null;
+      let touchContentScrollTop = 0;
+
+      const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+      const rand = (min, max) => min + Math.random() * (max - min);
+
+      function createNoiseGrid(columns, rows) {
+        const values = new Float32Array((columns + 1) * (rows + 1));
+        for (let i = 0; i < values.length; i++) values[i] = Math.random();
+        return { columns, rows, values };
+      }
+
+      function sampleNoise(grid, x, y) {
+        const gridX = x * grid.columns;
+        const gridY = y * grid.rows;
+        const x0 = Math.floor(gridX);
+        const y0 = Math.floor(gridY);
+        const tx = gridX - x0;
+        const ty = gridY - y0;
+        const smoothX = tx * tx * (3 - 2 * tx);
+        const smoothY = ty * ty * (3 - 2 * ty);
+        const rowWidth = grid.columns + 1;
+        const topLeft = grid.values[y0 * rowWidth + x0];
+        const topRight = grid.values[y0 * rowWidth + x0 + 1];
+        const bottomLeft = grid.values[(y0 + 1) * rowWidth + x0];
+        const bottomRight = grid.values[(y0 + 1) * rowWidth + x0 + 1];
+        const top = topLeft + (topRight - topLeft) * smoothX;
+        const bottom = bottomLeft + (bottomRight - bottomLeft) * smoothX;
+        return top + (bottom - top) * smoothY;
+      }
+
+      function createSandTexture() {
+        const textureScale = 3;
+        const textureWidth = Math.max(2, Math.ceil(width / textureScale));
+        const textureHeight = Math.max(2, Math.ceil(height / textureScale));
+        const textureContext = document.createElement("canvas").getContext("2d", { alpha: false });
+        textureContext.canvas.width = textureWidth;
+        textureContext.canvas.height = textureHeight;
+        const image = textureContext.createImageData(textureWidth, textureHeight);
+        const noiseLayers = [
+          createNoiseGrid(5, 4),
+          createNoiseGrid(13, 10),
+          createNoiseGrid(56, 42)
+        ];
+
+        for (let y = 0; y < textureHeight; y++) {
+          for (let x = 0; x < textureWidth; x++) {
+            const u = x / textureWidth;
+            const v = y / textureHeight;
+            const relief = (sampleNoise(noiseLayers[0], u, v) - 0.5) * 50
+              + (sampleNoise(noiseLayers[1], u, v) - 0.5) * 32
+              + (sampleNoise(noiseLayers[2], u, v) - 0.5) * 18;
+            const index = (y * textureWidth + x) * 4;
+            image.data[index] = clamp(Math.round(205 + relief), 0, 255);
+            image.data[index + 1] = clamp(Math.round(159 + relief * 0.82), 0, 255);
+            image.data[index + 2] = clamp(Math.round(131 + relief * 0.68), 0, 255);
+            image.data[index + 3] = 255;
+          }
+        }
+
+        textureContext.putImageData(image, 0, 0);
+        sandTexture = textureContext.canvas;
+      }
+
+      function createGrainSprites() {
+        const spriteSize = 24;
+        for (const color of grainColors) {
+          const sprite = document.createElement("canvas");
+          sprite.width = spriteSize;
+          sprite.height = spriteSize;
+          const spriteContext = sprite.getContext("2d");
+          const [red, green, blue] = color.match(/[a-f\d]{2}/gi).map((part) => parseInt(part, 16));
+          const shadow = spriteContext.createRadialGradient(13, 14, 0, 13, 14, 7);
+          shadow.addColorStop(0, "rgba(57, 39, 29, 0.14)");
+          shadow.addColorStop(1, "rgba(57, 39, 29, 0)");
+          spriteContext.fillStyle = shadow;
+          spriteContext.fillRect(4, 5, 16, 16);
+          const grain = spriteContext.createRadialGradient(10, 9, 0, 12, 12, 8);
+          grain.addColorStop(0, `rgba(${red}, ${green}, ${blue}, 0.72)`);
+          grain.addColorStop(0.2, `rgba(${red}, ${green}, ${blue}, 0.5)`);
+          grain.addColorStop(0.58, `rgba(${red}, ${green}, ${blue}, 0.22)`);
+          grain.addColorStop(1, `rgba(${red}, ${green}, ${blue}, 0)`);
+          spriteContext.fillStyle = grain;
+          spriteContext.fillRect(2, 2, 20, 20);
+          grainSprites.push(sprite);
+        }
+      }
+
+      function resizeCanvas() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        width = window.innerWidth;
+        height = window.innerHeight;
+        [canvas, textureCanvas].forEach((surface) => {
+          surface.width = Math.round(width * dpr);
+          surface.height = Math.round(height * dpr);
+          surface.style.width = `${width}px`;
+          surface.style.height = `${height}px`;
+        });
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        textureCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        createSandTexture();
+        const count = 3200;
+        particles = Array.from({ length: count }, (_, index) => {
+          const roll = Math.random();
+          const colorIndex = roll < 0.55 ? 0 : roll < 0.76 ? 1 : roll < 0.91 ? 2 : 3;
+          return {
+            angle: index * 2.399963229728653 + rand(-0.02, 0.02),
+            ring: Math.floor(Math.random() * 5),
+            radialJitter: rand(-0.035, 0.035),
+            x: width / 2,
+            y: height / 2,
+            vx: 0,
+            vy: 0,
+            phase: rand(0, Math.PI * 2),
+            size: rand(0.3, 1.05),
+            opacity: rand(0.18, 0.5),
+            colorIndex,
+            quartz: roll >= 0.91
+          };
+        });
+        const initialRadius = Math.min(width, height) * 0.1;
+        for (const particle of particles) {
+          const radius = initialRadius * (0.88 + particle.ring * 0.095 + particle.radialJitter);
+          particle.x = width / 2 + Math.cos(particle.angle) * radius;
+          particle.y = height / 2 + Math.sin(particle.angle) * radius;
+        }
+      }
+
+      function drawSandSurface(elapsed, breathPhase, isInhaling) {
+        const cx = width / 2;
+        const cy = height / 2;
+        const radius = Math.min(width, height) * (0.1 + breathPhase * 0.32);
+        textureCtx.clearRect(0, 0, width, height);
+        textureCtx.drawImage(sandTexture, 0, 0, width, height);
+
+        const veil = textureCtx.createRadialGradient(cx, cy, radius * 0.42, cx, cy, radius * 2.2);
+        veil.addColorStop(0, `rgba(255, 252, 245, ${0.22 + breathPhase * 0.13})`);
+        veil.addColorStop(0.34, `rgba(248, 219, 194, ${0.13 + breathPhase * 0.08})`);
+        veil.addColorStop(1, "rgba(166, 120, 92, 0)");
+        textureCtx.fillStyle = veil;
+        textureCtx.fillRect(0, 0, width, height);
+
+        textureCtx.save();
+        textureCtx.filter = "blur(8px)";
+        for (let ring = 0; ring < 5; ring++) {
+          const wave = Math.sin(elapsed * 1.05 - ring * 0.62) * (2 + breathPhase * 4);
+          const ringRadius = radius * (1.08 + ring * 0.14) + wave;
+          textureCtx.beginPath();
+          textureCtx.ellipse(cx, cy, ringRadius, ringRadius * 0.985, 0, 0, Math.PI * 2);
+          textureCtx.strokeStyle = ring % 2 === 0
+            ? `rgba(255, 250, 239, ${0.055 + breathPhase * 0.035})`
+            : `rgba(94, 58, 42, ${0.02 + (isInhaling ? 0.01 : 0.018)})`;
+          textureCtx.lineWidth = ring % 2 === 0 ? 2 : 1.5;
+          textureCtx.stroke();
+        }
+        textureCtx.restore();
+      }
+
+      function createMandala() {
+        const namespace = "http://www.w3.org/2000/svg";
+        const addPath = (d, opacity = 1) => {
+          const path = document.createElementNS(namespace, "path");
+          path.setAttribute("d", d);
+          path.setAttribute("opacity", String(opacity));
+          mandalaDrawing.append(path);
+        };
+        const addCircle = (radius, opacity = 1, dash = "") => {
+          const circle = document.createElementNS(namespace, "circle");
+          circle.setAttribute("r", String(radius));
+          circle.setAttribute("opacity", String(opacity));
+          if (dash) circle.setAttribute("stroke-dasharray", dash);
+          mandalaDrawing.append(circle);
+        };
+        const radii = [42, 78, 118, 166, 218, 278, 342, 408, 462];
+        radii.forEach((radius, index) => addCircle(radius, index % 2 ? 0.55 : 0.82, index === 2 ? "1.5 4" : ""));
+
+        for (let i = 0; i < 12; i++) {
+          const rotation = i * 30;
+          mandalaDrawing.insertAdjacentHTML("beforeend", `
+            <path transform="rotate(${rotation})" opacity="0.82"
+              d="M 0 -112 C 31 -151 35 -202 0 -258 C -35 -202 -31 -151 0 -112 Z"/>
+            <path transform="rotate(${rotation})" opacity="0.46"
+              d="M 0 -165 C 18 -190 20 -220 0 -247 C -20 -220 -18 -190 0 -165"/>
+          `);
+        }
+
+        for (let i = 0; i < 24; i++) {
+          const rotation = i * 15 + 7.5;
+          mandalaDrawing.insertAdjacentHTML("beforeend", `
+            <path transform="rotate(${rotation})" opacity="0.62"
+              d="M 0 -245 C 18 -276 19 -313 0 -356 C -19 -313 -18 -276 0 -245 Z"/>
+          `);
+        }
+
+        for (let i = 0; i < 36; i++) {
+          const angle = (Math.PI * 2 * i) / 36;
+          const x1 = Math.cos(angle) * 280;
+          const y1 = Math.sin(angle) * 280;
+          const x2 = Math.cos(angle) * 462;
+          const y2 = Math.sin(angle) * 462;
+          addPath(`M ${x1.toFixed(2)} ${y1.toFixed(2)} L ${x2.toFixed(2)} ${y2.toFixed(2)}`, i % 3 === 0 ? 0.42 : 0.2);
+        }
+
+        for (let petalCount of [12, 24]) {
+          const points = 1440;
+          const commands = [];
+          for (let i = 0; i <= points; i++) {
+            const theta = (Math.PI * 2 * i) / points;
+            const radius = 286 + 32 * Math.cos(petalCount * theta) + 10 * Math.cos((petalCount * 2) * theta);
+            const x = Math.cos(theta) * radius;
+            const y = Math.sin(theta) * radius;
+            commands.push(`${i === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`);
+          }
+          addPath(commands.join(" ") + " Z", petalCount === 12 ? 0.74 : 0.48);
+        }
+
+        for (let i = 0; i < 8; i++) {
+          const offset = i * 11;
+          addPath(`M ${-460 + offset} -70 Q 0 ${-115 - offset} ${460 - offset} -70`, 0.2);
+          addPath(`M ${-460 + offset} 70 Q 0 ${115 + offset} ${460 - offset} 70`, 0.2);
+        }
+      }
+
+      function activateInteraction() {
+        if (hasInteracted) return;
+        hasInteracted = true;
+        entryInvitation.classList.remove("is-visible");
+        entryInvitation.textContent = "";
+      }
+
+      function revealMenuIfReady(elapsed) {
+        if (elapsed < 9 || !hasInteracted || menuActivated) return;
+        menuActivated = true;
+        editorialNav.classList.add("is-visible");
+        editorialNav.inert = false;
+      }
+
+      function renderSection(section) {
+        const item = sections[section];
+        let body = "";
+
+        if (item.practices) {
+          body = `<div class="practice-list">${item.practices.map(([title, text]) => `
+            <article class="practice-item"><h2>${title}</h2><p>${text}</p></article>`).join("")}</div>`;
+        } else if (item.schedule) {
+          body = `<div class="schedule-list">${item.schedule.map(([time, description]) => `
+            <article class="schedule-item"><span class="schedule-time">${time}</span><p>${description}</p></article>`).join("")}</div>`;
+        } else if (item.quote) {
+          body = `<blockquote class="quote">${item.quote}</blockquote><p>${item.text}</p>`;
+        } else {
+          body = `<h1>${item.title}</h1><p>${item.text}</p>`;
+        }
+
+        if (item.contact) {
+          body += `<div class="contact-actions">
+            <a class="editorial-link" href="https://wa.me/5521997143333?text=${encodeURIComponent("Olá! Gostaria de agendar uma aula experimental de Yoga.")}" target="_blank" rel="noopener noreferrer">Agendar aula experimental <span aria-hidden="true">→</span></a>
+            <a class="editorial-link" href="https://wa.me/5521997143333?text=${encodeURIComponent("Olá! Gostaria de conversar sobre as práticas de Yoga.")}" target="_blank" rel="noopener noreferrer">Conversar no WhatsApp <span aria-hidden="true">→</span></a>
+          </div>`;
+        }
+
+        contentStage.innerHTML = `<article class="editorial-content is-entering">
+          <div class="eyebrow">${item.label}</div>
+          ${body}
+        </article>`;
+        const content = contentStage.firstElementChild;
+        content.offsetHeight;
+        requestAnimationFrame(() => content.classList.remove("is-entering"));
+        menuButtons.forEach((button) => {
+          if (Number(button.dataset.section) === section) button.setAttribute("aria-current", "page");
+          else button.removeAttribute("aria-current");
+        });
+      }
+
+      function finishNavigation(section) {
+        currentSection = section;
+        brand.classList.toggle("is-small", section >= 0);
+        editorialNav.classList.toggle("is-section", section >= 0);
+        mandala.style.setProperty("--mandala-opacity", section >= 0 ? "0.13" : "0.16");
+        returnHomeButton.classList.toggle("is-visible", section >= 0);
+        returnHomeButton.inert = section < 0;
+        if (section < 0) {
+          contentStage.replaceChildren();
+          menuButtons.forEach((button) => button.removeAttribute("aria-current"));
+        } else {
+          renderSection(section);
+        }
+      }
+
+      function transitionTo(section) {
+        if (!menuActivated || isTransitioning || section === currentSection) return;
+        isTransitioning = true;
+        const oldContent = contentStage.firstElementChild;
+        if (oldContent) oldContent.classList.add("is-leaving");
+
+        window.setTimeout(() => {
+          finishNavigation(section);
+          window.setTimeout(() => { isTransitioning = false; }, 1000);
+        }, 1000);
+      }
+
+      function showRelaxationHint() {
+        if ((performance.now() - startedAt) / 1000 < 6.5) return;
+        let nextIndex = Math.floor(Math.random() * relaxationPhrases.length);
+        if (nextIndex === lastPhraseIndex) nextIndex = (nextIndex + 1) % relaxationPhrases.length;
+        lastPhraseIndex = nextIndex;
+        hintTimers.forEach(window.clearTimeout);
+        hintTimers = [];
+        hint.classList.remove("is-visible");
+        window.setTimeout(() => {
+          hint.textContent = relaxationPhrases[nextIndex];
+          hint.classList.add("is-visible");
+        }, 30);
+        hintTimers.push(window.setTimeout(() => hint.classList.remove("is-visible"), 3000));
+        hintTimers.push(window.setTimeout(() => { hint.textContent = ""; }, 3800));
+      }
+
+      function navigateByStep(direction) {
+        if (!menuActivated || isTransitioning) return;
+        const next = clamp(currentSection + direction, -1, sections.length - 1);
+        if (next !== currentSection) transitionTo(next);
+      }
+
+      menuButtons.forEach((button) => {
+        button.addEventListener("click", () => transitionTo(Number(button.dataset.section)));
+      });
+
+      brand.addEventListener("click", () => transitionTo(-1));
+      returnHomeButton.addEventListener("click", () => transitionTo(-1));
+
+      window.addEventListener("pointerdown", () => {
+        activateInteraction();
+        showRelaxationHint();
+      }, { passive: true });
+
+      window.addEventListener("click", (event) => {
+        if (event.detail === 0) {
+          activateInteraction();
+          showRelaxationHint();
+        }
+      });
+
+      window.addEventListener("wheel", (event) => {
+        activateInteraction();
+        const content = event.target instanceof Element ? event.target.closest(".editorial-content") : null;
+        if (content && content.scrollHeight > content.clientHeight) {
+          const canScrollWithinContent = event.deltaY > 0
+            ? content.scrollTop + content.clientHeight < content.scrollHeight - 1
+            : content.scrollTop > 0;
+          if (canScrollWithinContent) return;
+        }
+        if (event.deltaY !== 0) {
+          scrollEnergy = Math.min(1.5, scrollEnergy + Math.min(Math.abs(event.deltaY) / 450, 0.8));
+          if (menuActivated) navigateByStep(event.deltaY > 0 ? 1 : -1);
+        }
+        event.preventDefault();
+      }, { passive: false });
+
+      window.addEventListener("touchstart", (event) => {
+        activateInteraction();
+        previousTouchY = event.touches.length ? event.touches[0].clientY : null;
+        previousTouchContent = event.target instanceof Element ? event.target.closest(".editorial-content") : null;
+        touchContentScrollTop = previousTouchContent ? previousTouchContent.scrollTop : 0;
+        if (!window.PointerEvent) showRelaxationHint();
+      }, { passive: true });
+
+      window.addEventListener("touchend", (event) => {
+        if (previousTouchY === null || !event.changedTouches.length) return;
+        const delta = previousTouchY - event.changedTouches[0].clientY;
+        previousTouchY = null;
+        if (previousTouchContent && Math.abs(previousTouchContent.scrollTop - touchContentScrollTop) > 2) {
+          previousTouchContent = null;
+          return;
+        }
+        previousTouchContent = null;
+        if (Math.abs(delta) < 38) return;
+        scrollEnergy = Math.min(1.5, scrollEnergy + Math.min(Math.abs(delta) / 380, 0.8));
+        if (menuActivated) navigateByStep(delta > 0 ? 1 : -1);
+      }, { passive: true });
+
+      window.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowDown" || event.key === "PageDown") {
+          event.preventDefault();
+          activateInteraction();
+          if (menuActivated) navigateByStep(1);
+        } else if (event.key === "ArrowUp" || event.key === "PageUp") {
+          event.preventDefault();
+          activateInteraction();
+          if (menuActivated) navigateByStep(-1);
+        } else if (event.key === "Home" && menuActivated) {
+          event.preventDefault();
+          transitionTo(-1);
+        }
+      });
+
+      function updateParticles(dt, elapsed, breathPhase, isInhaling) {
+        const cx = width / 2;
+        const cy = height / 2;
+        const lightRadius = Math.min(width, height) * (0.1 + breathPhase * 0.32);
+        const scrollWave = scrollEnergy * 34;
+        grainBuckets.forEach((bucket) => { bucket.length = 0; });
+
+        for (const particle of particles) {
+          const dx = particle.x - cx;
+          const dy = particle.y - cy;
+          const radius = Math.max(0.001, Math.hypot(dx, dy));
+          const ux = dx / radius;
+          const uy = dy / radius;
+          const targetRadius = lightRadius * (0.92 + particle.ring * 0.105 + particle.radialJitter);
+          const ringVibration = isInhaling ? 0 : Math.sin(elapsed * 2.4 + particle.phase) * 2.4;
+          const scrollRipple = scrollWave * Math.sin(radius * 0.035 - elapsed * 2.1 + particle.phase);
+          const radialForce = (targetRadius - radius) * 4 + ringVibration + scrollRipple + (isInhaling ? 5 * breathPhase : 0);
+
+          if (!reducedMotionQuery.matches) {
+            particle.vx = (particle.vx + ux * radialForce * dt) * 0.86;
+            particle.vy = (particle.vy + uy * radialForce * dt) * 0.86;
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+          }
+
+          const halo = Math.max(0, 1 - Math.abs(radius - lightRadius) / Math.max(1, lightRadius * 0.5));
+          const specular = particle.quartz ? 0.35 + breathPhase * halo * 0.6 : 1;
+          const opacity = clamp(particle.opacity * specular, 0.06, 0.52);
+          const opacityBin = Math.min(7, Math.floor(opacity * 8));
+          grainBuckets[particle.colorIndex * 8 + opacityBin].push(particle);
+        }
+
+        const veil = ctx.createRadialGradient(cx, cy, lightRadius * 0.78, cx, cy, lightRadius * 1.75);
+        veil.addColorStop(0, `rgba(255, 252, 245, ${0.08 + breathPhase * 0.06})`);
+        veil.addColorStop(0.52, `rgba(255, 238, 215, ${0.045 + breathPhase * 0.025})`);
+        veil.addColorStop(1, "rgba(255, 238, 215, 0)");
+        ctx.fillStyle = veil;
+        ctx.fillRect(0, 0, width, height);
+
+        grainBuckets.forEach((bucket, index) => {
+          if (!bucket.length) return;
+          ctx.globalAlpha = clamp(((index % 8) + 0.5) / 8, 0.06, 0.52);
+          const sprite = grainSprites[Math.floor(index / 8)];
+          bucket.forEach((particle) => {
+            const stampSize = particle.size * 3.8;
+            ctx.drawImage(sprite, particle.x - stampSize / 2, particle.y - stampSize / 2, stampSize, stampSize);
+          });
+        });
+        ctx.globalAlpha = 1;
+        scrollEnergy *= Math.exp(-dt * 1.25);
+      }
+
+      function animate(now) {
+        animationFrameId = null;
+        if (document.hidden) return;
+        const elapsed = (now - startedAt) / 1000;
+        const dt = Math.min(0.04, Math.max(0.001, (now - previousFrame) / 1000));
+        previousFrame = now;
+        const breathPhase = 0.5 * (1 - Math.cos((2 * Math.PI * elapsed) / 6.0));
+        const isInhaling = Math.sin((2 * Math.PI * elapsed) / 6.0) >= 0;
+        const revealProgress = clamp((elapsed - 6) / 3, 0, 1);
+        const easedReveal = revealProgress * revealProgress * (3 - 2 * revealProgress);
+
+        document.documentElement.style.setProperty("--breath-radius", `${10 + breathPhase * 32}vmin`);
+        document.documentElement.style.setProperty("--breath-opacity", String(0.65 + breathPhase * 0.33));
+        brand.style.setProperty("--logo-reveal", String(elapsed < 6 ? 0 : easedReveal));
+        brand.classList.toggle("is-visible", elapsed >= 6);
+        brand.inert = elapsed < 6;
+        revealMenuIfReady(elapsed);
+        if (elapsed >= 9.5 && !hasInteracted && !entryInvitation.classList.contains("is-visible")) {
+          entryInvitation.textContent = "Toque ou role para adentrar";
+          entryInvitation.classList.add("is-visible");
+        }
+        if (elapsed >= 9) {
+          const baseOpacity = currentSection < 0 ? 0.16 : 0.13;
+          mandala.classList.add("is-visible");
+          mandala.style.setProperty("--mandala-scale", String(0.985 + breathPhase * 0.025));
+          if (mandala.dataset.opacity !== String(baseOpacity)) {
+            mandala.style.setProperty("--mandala-opacity", String(baseOpacity));
+            mandala.dataset.opacity = String(baseOpacity);
+          }
+        }
+
+        drawSandSurface(elapsed, breathPhase, isInhaling);
+        ctx.clearRect(0, 0, width, height);
+        updateParticles(dt, elapsed, breathPhase, isInhaling);
+        animationFrameId = requestAnimationFrame(animate);
+      }
+
+      function updateBrandRule() {
+        const start = brandWord.getEndPositionOfChar(0).x + 2;
+        const end = brandWord.getStartPositionOfChar(6).x - 2;
+        brandRule.setAttribute("d", `M ${start} 112 H ${end}`);
+      }
+
+      function handleVisibilityChange() {
+        if (document.hidden) {
+          if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
+          animationFrameId = null;
+          return;
+        }
+        previousFrame = performance.now();
+        if (animationFrameId === null) animationFrameId = requestAnimationFrame(animate);
+      }
+
+      window.addEventListener("resize", resizeCanvas, { passive: true });
+      mobileQuery.addEventListener?.("change", resizeCanvas);
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+      document.fonts.ready.then(updateBrandRule);
+      createMandala();
+      createGrainSprites();
+      resizeCanvas();
+      updateBrandRule();
+      if (!document.hidden) animationFrameId = requestAnimationFrame(animate);
+    })();
+  </script>
+</body>
+</html>
